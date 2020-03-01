@@ -71,7 +71,7 @@ class Exasol(BaseQueryRunner):
                 "timeout": {"type": "number", "default": 180}
             },
             "required": ["host", "port", "user", "password", "schema"],
-            "order": ["host", "port", "user", "password", "schema"],
+            "order": ["host", "port", "user", "password", "schema", "timeout"],
             "secret": ["password"],
         }
 
