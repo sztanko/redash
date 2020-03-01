@@ -89,8 +89,7 @@ class Exasol(BaseQueryRunner):
             json_lib="rapidjson",
             fetch_mapper=_exasol_type_mapper,
             query_timeout=self.configuration.get("timeout", 180),
-            client_name=CLIENT_NAME,
-            snapshot_transactions=True
+            client_name=CLIENT_NAME
         )
 
     def run_query(self, query, user):
