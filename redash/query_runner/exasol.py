@@ -3,6 +3,7 @@ import datetime
 from redash.query_runner import *
 from redash.utils import json_dumps
 
+CLIENT_NAME = "Redash/PyEXASOL"
 
 def _exasol_type_mapper(val, data_type):
     if val is None:
@@ -66,9 +67,11 @@ class Exasol(BaseQueryRunner):
                 "password": {"type": "string"},
                 "host": {"type": "string"},
                 "port": {"type": "number", "default": 8563},
+                "schema": {"type": "string"},
+                "timeout": {"type": "number", "default": 180}
             },
-            "required": ["host", "port", "user", "password"],
-            "order": ["host", "port", "user", "password"],
+            "required": ["host", "port", "user", "password", "schema"],
+            "order": ["host", "port", "user", "password", "schema"],
             "secret": ["password"],
         }
 
@@ -81,9 +84,13 @@ class Exasol(BaseQueryRunner):
             dsn=exahost,
             user=self.configuration.get("user", None),
             password=self.configuration.get("password", None),
-            compression=True,
+            compression=False,
+            schema=self.configuration.get("schema", None),
             json_lib="rapidjson",
             fetch_mapper=_exasol_type_mapper,
+            query_timeout=self.configuration.get("timeout", 180),
+            client_name=CLIENT_NAME,
+            snapshot_transactions=True
         )
 
     def run_query(self, query, user):
@@ -110,7 +117,7 @@ class Exasol(BaseQueryRunner):
         return json_data, error
 
     def get_schema(self, get_stats=False):
-        query = """
+        query = """/*snapshot execution*/
         SELECT
             COLUMN_SCHEMA,
             COLUMN_TABLE,
